@@ -1384,7 +1384,7 @@ Bug 修复 (Fixes):           184 (61%)  ⬆️ 显著高于已合并PR
 
 **报告作者 / Report Author:** AI Analysis System  
 **报告日期 / Report Date:** 2026年2月5日 / February 5, 2026  
-**版本 / Version:** v1.0  
+**版本 / Version:** v1.1 (包含开放PR队列分析 / Including Open PR Queue Analysis)  
 **联系方式 / Contact:** GitHub Issues for feedback
 
 ---
