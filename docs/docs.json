@@ -804,6 +804,7 @@
                 "group": "Fundamentals",
                 "pages": [
                   "concepts/architecture",
+                  "concepts/ai-era-pain-points",
                   "concepts/agent",
                   "concepts/agent-loop",
                   "concepts/system-prompt",
@@ -1232,6 +1233,7 @@
                 "group": "Fundamentals",
                 "pages": [
                   "zh-CN/concepts/architecture",
+                  "zh-CN/concepts/ai-era-pain-points",
                   "zh-CN/concepts/agent",
                   "zh-CN/concepts/agent-loop",
                   "zh-CN/concepts/system-prompt",
