@@ -112,3 +112,53 @@
 | https://github.com/openclaw/openclaw/pull/12304 | feat: add DeSearch as web_search provider | Other | Open | N/A | unknown |
 | https://github.com/openclaw/openclaw/pull/12303 | fix(cron): correct nextRunAtMs calculation and prevent timer stall | Other | Open | N/A | unknown |
 | https://github.com/openclaw/openclaw/pull/12302 | fix(skills): apply agents.list skill filter in embedded runner paths | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12302 | fix(skills): apply agents.list skill filter in embedded runner paths | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12296 | security: persistence-only secret redaction for session transcripts | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12295 | fix(mattermost): preserve newlines in inbound messages during mention removal | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12293 | fix: recover Telegram sends from stale thread ids | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12291 | feat: changeset enforcement + similar issue search | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12287 | fix(security): prevent String(undefined) coercion in credential inputs | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12286 | fix(skills): apply agents.list[].skills filter at runtime | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12285 | feat: changeset enforcement + similar issue search | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12283 | Gateway: fix post-compaction amnesia for injected messages (web chat) | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12282 | Jira CLI skill: create/list tools with Docker integration | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12281 | fix(ios): operator connection auth loop + dual gateway architecture | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12273 | fix: prevent billing error false positive on bare '402' in chat content | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12270 | fix: add synchronous config fallback to lookupContextTokens | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12268 | fix: format sessions_history timestamps using configured userTimezone | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12266 | fix: prevent cron jobs from getting stuck when next-run time is in the past | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12260 | fix: redact secrets in tool results before persisting to session transcript | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12257 | fix(mattermost): default table mode to 'off' for native Markdown rendering | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12254 | fix: add minimum token guard to prevent double compaction after flush | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12253 | fix(daemon): use execFileSync instead of execSync to prevent shell injection | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12251 | fix(security): use timing-safe comparison for hook token authentication | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12248 | fix: wire streaming config field through resolveExtraParams to streamFn | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12244 | fix(slack): preserve thread context for DM thread replies | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12240 | fix: suppress heartbeat agent events from webchat broadcast | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12239 | fix(zalo): support photo_url field for inbound images | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12234 | gateway: incident tracking, recover command, and ciao ERR_SERVER_CLOSED hardening | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12231 | fix(read): add directory check before reading file | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12230 | fix: cap Discord gateway reconnect at 50 attempts to prevent infinite loop | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12229 | fix: update DEFAULT_CONTEXT_TOKENS from 200K to 1M for Opus 4.6 | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12227 | fix: wrap waitForCompactionRetry with abort signal to prevent session lock leak | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12226 | fix: remove billing error false-positive from sanitizeUserFacingText | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12225 | fix(gateway): ensure restart pings route via lastAccountId | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12224 | fix(cron): ensure computeNextRunAtMs is deterministic | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12223 | fix(gateway): filter HEARTBEAT_OK and separate internal from webchat | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12222 | fix(gateway): include scripts/ui.js in npm package with graceful fallback | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12220 | fix: forward-compat models now respect user-configured contextWindow | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12212 | test: normalize paths in OPENCLAW_HOME tests for cross-platform support | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12211 | fix(slack): prevent duplicate message delivery via block streaming deduplication | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12209 | fix(skills): refresh stale skill snapshot after gateway restart | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12207 | fix(gateway): use timing-safe comparison for hook token authentication | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12206 | test: skip unix-path OPENCLAW_HOME tests on Windows | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12205 | macOS: honor stable Nix defaults suite | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12204 | fix(discord): resolve numeric guildId/channelId pairs in channel allowlist | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12199 | fix(message): add threadId parameter to fetch schema for Slack thread reading | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12195 | fix(agents): sync config fallback for lookupContextTokens cold-start race | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12191 | fix: guard against undefined model.input in display and scan layers | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12190 | fix: thinking toggle invisible in light mode | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12188 | fix(nodes): raise transport timeout for exec.approval.request (#12098) | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12187 | security: redact secrets from tool results before persisting to session transcript | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12184 | fix(auto-reply): suppress reset banner in group chats | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12183 | feat: Zulip channel plugin | Other | Open | N/A | unknown |
