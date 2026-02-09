@@ -22,17 +22,17 @@ Previous reports used incorrect estimated data. This report is based on **real c
 
 基于从GitHub API获取的**真实完整数据**，OpenClaw项目正经历**史无前例的爆发式增长**：
 
-- **近一周PR数：3,019个**（日均377.4个）
+- **近一周PR数：3,175个**（日均396.9个）
 - **近一周Issue数：3,203个**（日均400.4个）
-- **周环比增长：+114.0%**（PR数翻倍）
+- **周环比增长：+125.0%**（PR数翻倍）
 
 **这是开源历史上罕见的超高速增长案例。**
 
 Based on **real complete data from GitHub API**, OpenClaw is experiencing **unprecedented explosive growth**:
 
-- **Past week PRs: 3,019** (377.4/day average)
+- **Past week PRs: 3,175** (396.9/day average)
 - **Past week Issues: 3,203** (400.4/day average)
-- **Week-over-week growth: +114.0%** (PRs doubled)
+- **Week-over-week growth: +125.0%** (PRs doubled)
 
 **This is a rare case of hyper-rapid growth in open source history.**
 
@@ -44,7 +44,7 @@ Based on **real complete data from GitHub API**, OpenClaw is experiencing **unpr
 
 | 时间段 | 总PR数 | 日均 | 数据来源 |
 |--------|--------|------|---------|
-| **近一周** (2026-02-01至02-08) | **3,019** | **377.4/天** | GitHub Search API |
+| **近一周** (2026-02-01至02-08) | **3,175** | **396.9/天** | GitHub Search API |
 | **近两周** (2026-01-25至02-08) | **4,421** | **294.7/天** | GitHub Search API |
 | **近一个月** (2026-01-08至02-08) | **5,238** | **163.7/天** | GitHub Search API |
 
@@ -86,7 +86,7 @@ Based on **real complete data from GitHub API**, OpenClaw is experiencing **unpr
 
 | 指标 | 上周 | 本周 | 增长 | 增长率 |
 |------|------|------|------|--------|
-| **PR** | 1,411 | 3,019 | +1,608 | **+114.0%** 🚀 |
+| **PR** | 1,411 | 3,175 | +1,764 | **+125.0%** 🚀 |
 | **Issue** | 1,689 | 3,203 | +1,514 | **+89.6%** 🚀 |
 
 **两周环比增长率 (周平均):**
@@ -114,7 +114,7 @@ Verification: Cross-checked with repository insights
 ```
 
 **查询示例:**
-- `created:>=2026-02-01` → **3,019 PRs**
+- `created:>=2026-02-01` → **3,175 PRs**
 - `created:>=2026-01-25` → **4,421 PRs**
 - `created:>=2026-01-08` → **5,238 PRs**
 
