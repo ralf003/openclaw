@@ -72,3 +72,43 @@
 | https://github.com/openclaw/openclaw/pull/12376 | feat: Add DuckDuckGo as free web search provider | Other | Closed | N/A | unknown |
 | https://github.com/openclaw/openclaw/pull/12372 | fix(googlechat): detect bot @mention by user.type fallback | Other | Closed | N/A | unknown |
 | https://github.com/openclaw/openclaw/pull/12371 | fix(security): sanitize error responses to prevent information leakage | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12370 | fix(security): default standalone servers to loopback bind | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12369 | fix: register unhandled rejection handler for Slack monitor | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12368 | fix(cron): respect OPENCLAW_STATE_DIR for cron store path | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12366 | feat(context): preemptive exec result cap near context limit | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12365 | test(heartbeat): don't skip empty HEARTBEAT.md for cron wake events | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12364 | fix(gateway): hide phantom main agent when agents.list is configured | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12363 | fix(gateway): read WebSocket image upload limit from config instead of hardcoding 5MB | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12362 | fix(session): circuit-breaker on repeated context overflow | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12360 | fix(browser): allow configuring relay host in Chrome extension | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12359 | Update the browser URL support to include WebSocket protocols | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12358 | fix: Sessions format timestamps in sessions_history using userTimezone | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12357 | feat(tts): add stripMarkdown config option to clean text before synthesis | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12356 | fix(telegram): truncate commands to 100 to avoid BOT_COMMANDS_TOO_MUCH | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12353 | fix(telegram): catch fetch TypeError in unhandled rejection handler | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12352 | fix(auto-reply): allow image-only messages to reach the agent | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12351 | fix(a2a): harden announce target resolution + DNS rebinding defense | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12349 | fix(exec): cap tool-result output separately from process cache | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12347 | fix(discord): prevent 404 when resolving guild-only config entries | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12344 | feat(skills): add sentinel security skills and model-router | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12342 | fix: circuit breaker for consecutive tool validation failures (#7500) | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12341 | fix(media): classify text/* MIME types as documents | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12334 | fix(macos): guard against SIGABRT when no audio input device available | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12332 | feat(feishu): add CardKit streaming and multi-backend fallback | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12331 | fix(skills): detect Windows executables in hasBinary using PATHEXT | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12330 | fix(googlechat): detect bot @mentions by user type in Space webhooks | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12329 | Sync upstream main | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12326 | [AI-assisted] Discord: fix bare guild ID misrouted as channel ID | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12325 | fix: trim leading/trailing whitespace from outbound messages | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12324 | fix(voice-call): pass stream auth token via Twilio <Parameter> element | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12321 | sync fork with main repo (upstream) | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12318 | fix: Use defer for file handle cleanup in TranslationMemory.Save() | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12316 | feat(skill): add kis-trading skill for Korean stock trading via KIS Open API | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12315 | fix(daemon): detect and handle stale service entrypoints | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12314 | fix: treat HTTP 5xx server errors as failover-worthy | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12310 | cron: pass agentDir to embedded runner for isolated sessions | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12308 | fix(cli): redirect log output to stderr during completion script generation | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12305 | fix: Sessions format timestamps in sessions_history using userTimezone | Other | Closed | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12304 | feat: add DeSearch as web_search provider | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12303 | fix(cron): correct nextRunAtMs calculation and prevent timer stall | Other | Open | N/A | unknown |
+| https://github.com/openclaw/openclaw/pull/12302 | fix(skills): apply agents.list skill filter in embedded runner paths | Other | Open | N/A | unknown |
