@@ -9,6 +9,7 @@ vi.mock("../channel-capabilities.js", () => ({
     groupAllowFromFallbackToAllowFrom: channelName !== "imessage",
     warnOnEmptyGroupSenderAllowlist: channelName !== "discord",
   }),
+  resolveDoctorChannelAccountIds: () => undefined,
 }));
 
 vi.mock("./channel-doctor.js", () => ({
@@ -26,30 +27,7 @@ describe("doctor empty allowlist policy warnings", () => {
       channelName: "signal",
       doctorFixCommand: "openclaw doctor --fix",
       prefix: "channels.signal",
-    });
-
-    expect(warnings).toEqual([
-      '- channels.signal.dmPolicy is "allowlist" but allowFrom is empty — all DMs will be blocked. Add sender IDs to channels.signal.allowFrom, or run "openclaw doctor --fix" to auto-migrate from pairing store when entries exist.',
-    ]);
-  });
-
-  it("warns when non-telegram group allowlist mode does not fall back to allowFrom", () => {
-    const warnings = collectEmptyAllowlistPolicyWarningsForAccount({
-      account: { groupPolicy: "allowlist" },
-      channelName: "imessage",
-      doctorFixCommand: "openclaw doctor --fix",
-      prefix: "channels.imessage",
-    });
-
-    expect(warnings).toEqual([
-      '- channels.imessage.groupPolicy is "allowlist" but groupAllowFrom is empty — this channel does not fall back to allowFrom, so all group messages will be silently dropped. Add sender IDs to channels.imessage.groupAllowFrom, or set groupPolicy to "open".',
-    ]);
-  });
-
-  it("stays quiet for zalouser hybrid route-and-sender group access", () => {
-    const warnings = collectEmptyAllowlistPolicyWarningsForAccount({
-      account: { groupPolicy: "allowlist" },
-      channelName: "zalouser",
+    e: "zalouser",
       doctorFixCommand: "openclaw doctor --fix",
       prefix: "channels.zalouser",
     });

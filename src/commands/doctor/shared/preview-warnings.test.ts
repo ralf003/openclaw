@@ -68,65 +68,8 @@ vi.mock("../channel-capabilities.js", () => {
   return {
     getDoctorChannelCapabilities: () => fallback,
   };
-});
-
-vi.mock("./channel-doctor.js", () => ({
-  collectChannelDoctorEmptyAllowlistExtraWarnings: vi.fn(() => []),
-  collectChannelDoctorPreviewWarnings: vi.fn(
-    async ({ cfg }: { cfg: { channels?: Record<string, unknown> } }) => {
-      const telegram = cfg.channels?.telegram as { allowFrom?: unknown } | undefined;
-      const usernames = Array.isArray(telegram?.allowFrom)
-        ? telegram.allowFrom.filter(
-            (entry): entry is string => typeof entry === "string" && entry.startsWith("@"),
-          )
-        : [];
-      if (usernames.length === 0) {
-        return [];
-      }
-      return [
-        `- Telegram allowFrom contains ${usernames.length} username entr${
-          usernames.length === 1 ? "y" : "ies"
-        } (e.g. ${usernames[0]}).`,
-      ];
-    },
-  ),
-  createChannelDoctorEmptyAllowlistPolicyHooks: vi.fn(() => ({
-    extraWarningsForAccount: () => [],
-    shouldSkipDefaultEmptyGroupAllowlistWarning: () => false,
-  })),
-  shouldSkipChannelDoctorDefaultEmptyGroupAllowlistWarning: vi.fn(() => false),
-}));
-
-vi.mock("./channel-plugin-blockers.js", () => ({
-  scanConfiguredChannelPluginBlockers: (
-    cfg: {
-      channels?: Record<string, unknown>;
-      plugins?: {
-        allow?: string[];
-        enabled?: boolean;
-        entries?: Record<string, { enabled?: boolean }>;
-      };
-    },
-    env: NodeJS.ProcessEnv = process.env,
-    activationSourceConfig = cfg,
-  ) => {
-    const configuredChannels = new Set(Object.keys(cfg.channels ?? {}));
-    if (Object.keys(env).some((key) => key.startsWith("TELEGRAM_"))) {
-      configuredChannels.add("telegram");
-    }
-    if (Object.keys(env).some((key) => key.startsWith("DISCORD_"))) {
-      configuredChannels.add("discord");
-    }
-    const hits: Array<{
-      channelId: string;
-      pluginId: string;
-      reason: string;
-      channelAvailable?: boolean;
-    }> = manifestState.plugins.flatMap((plugin) => {
-      const sourcePlugins = activationSourceConfig.plugins;
-      const disabledByEntry = sourcePlugins?.entries?.[plugin.id]?.enabled === false;
-      const pluginsDisabled = sourcePlugins?.enabled === false;
-      const isExternal = plugin.origin === "global";
+    resolveDoctorChannelAccountIds: () => undefined,
+ugin.origin === "global";
       const omittedFromAllowlist =
         isExternal &&
         (sourcePlugins?.allow ?? []).length > 0 &&

@@ -13,6 +13,7 @@ vi.mock("../channel-capabilities.js", () => ({
     groupAllowFromFallbackToAllowFrom: true,
     warnOnEmptyGroupSenderAllowlist: true,
   }),
+  resolveDoctorChannelAccountIds: () => undefined,
 }));
 
 describe("doctor open-policy allowFrom repair", () => {
@@ -23,39 +24,7 @@ describe("doctor open-policy allowFrom repair", () => {
           dmPolicy: "open",
         },
       },
-    });
-
-    expect(result.changes).toEqual([
-      '- channels.signal.allowFrom: set to ["*"] (required by dmPolicy="open")',
-    ]);
-    expect(result.config.channels?.signal?.allowFrom).toEqual(["*"]);
-  });
-
-  it("repairs nested-only googlechat dm allowFrom", () => {
-    const result = maybeRepairOpenPolicyAllowFrom({
-      channels: {
-        googlechat: {
-          dm: {
-            policy: "open",
-          },
-        },
-      },
-    });
-
-    expect(result.changes).toEqual([
-      '- channels.googlechat.dm.allowFrom: set to ["*"] (required by dmPolicy="open")',
-    ]);
-    expect(result.config.channels?.googlechat?.dm?.allowFrom).toEqual(["*"]);
-  });
-
-  it("repairs nested-only matrix dm allowFrom", () => {
-    const result = maybeRepairOpenPolicyAllowFrom({
-      channels: {
-        matrix: {
-          dm: {
-            policy: "open",
-          },
-        },
+    ,
       },
     });
 
