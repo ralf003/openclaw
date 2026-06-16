@@ -998,17 +998,25 @@ export function redactToolDetail(detail: string): string {
 function resolveToolPayloadRedaction(
   loggingConfig: LoggingConfig | undefined = readLoggingConfig(),
 ): RedactOptions {
+  const mode = normalizeMode(loggingConfig?.redactSensitive);
   const userPatterns = loggingConfig?.redactPatterns;
+  if (mode === "off") {
+    // When log redaction is off, still apply user-configured redactPatterns
+    // (if any) but skip the built-in defaults so Bearer tokens etc. survive.
+    const patterns =
+      userPatterns && userPatterns.length > 0 ? [...userPatterns] : undefined;
+    return { mode, patterns };
+  }
   const patterns =
     userPatterns && userPatterns.length > 0
       ? [...userPatterns, ...DEFAULT_REDACT_PATTERNS]
       : undefined;
-  return { mode: "tools", patterns };
+  return { mode, patterns };
 }
 
-// Forces tools-mode regardless of `logging.redactSensitive` (which governs log
-// output, not UI surfaces), and merges user `logging.redactPatterns` with the
-// built-in defaults so both apply.
+// Respects `logging.redactSensitive` so "off" disables all redaction (previously
+// forced tools-mode, making `redactSensitive: off` ineffective for tool args).
+// Merges user `logging.redactPatterns` with the built-in defaults when enabled.
 export function redactToolPayloadText(text: string): string {
   return redactToolPayloadTextWithConfig(text, readLoggingConfig());
 }
