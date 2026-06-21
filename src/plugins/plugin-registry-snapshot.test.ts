@@ -935,12 +935,12 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
     expectDiagnosticsContainCode(result.diagnostics, "persisted-registry-stale-source");
   });
 
-  it("keeps persisted registry when a non-plugin diagnostic source path still does not exist", () => {
+  it("refreshes registry when an orphan diagnostic without pluginId exists", () => {
     const tempRoot = makeTempDir();
     const stateDir = path.join(tempRoot, "state");
     const env = { ...createHermeticEnv(tempRoot), OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1" };
     const config = {};
-    const missingConfiguredPath = path.join(tempRoot, "missing-configured-plugin");
+    const missingConfiguredPath = path.join(tempRoot, "missing-configured-path.js");
     const index: InstalledPluginIndex = {
       ...loadInstalledPluginIndex({ config, env, stateDir, installRecords: {} }),
       diagnostics: [
@@ -948,6 +948,7 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
           level: "error",
           message: `plugin path not found: ${missingConfiguredPath}`,
           source: missingConfiguredPath,
+          code: "orphan-source-path",
         },
       ],
     };
@@ -955,8 +956,32 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
 
     const result = loadPluginRegistrySnapshotWithMetadata({ config, env, stateDir });
 
-    expect(result.source).toBe("persisted");
-    expectDiagnosticsContainSource(result.snapshot.diagnostics, missingConfiguredPath);
-    expect(result.diagnostics).toStrictEqual([]);
+    expect(result.source).toBe("derived");
+    expectDiagnosticsContainCode(result.diagnostics, "persisted-registry-stale-source");
+  });
+
+  it("refreshes registry for orphan diagnostics even when the source path still does not exist", () => {
+    const tempRoot = makeTempDir();
+    const stateDir = path.join(tempRoot, "state");
+    const env = { ...createHermeticEnv(tempRoot), OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1" };
+    const config = {};
+    const missingConfiguredPath = path.join(tempRoot, "missing-configured-path.js");
+    const index: InstalledPluginIndex = {
+      ...loadInstalledPluginIndex({ config, env, stateDir, installRecords: {} }),
+      diagnostics: [
+        {
+          level: "error",
+          message: `plugin path not found: ${missingConfiguredPath}`,
+          source: missingConfiguredPath,
+          code: "orphan-source-path",
+        },
+      ],
+    };
+    writePersistedInstalledPluginIndexSync(index, { stateDir });
+
+    const result = loadPluginRegistrySnapshotWithMetadata({ config, env, stateDir });
+
+    expect(result.source).toBe("derived");
+    expectDiagnosticsContainCode(result.diagnostics, "persisted-registry-stale-source");
   });
 });

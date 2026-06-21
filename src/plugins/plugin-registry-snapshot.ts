@@ -404,6 +404,9 @@ function resolveRecordPackageJsonPath(plugin: InstalledPluginIndexRecord): strin
 
 function hasStalePersistedPluginDiagnostics(index: InstalledPluginIndex): boolean {
   return index.diagnostics.some((diag) => {
+    if (diag.code === "orphan-source-path") {
+      return true;
+    }
     const source = diag.source;
     return (
       typeof diag.pluginId === "string" &&
