@@ -75,6 +75,7 @@ export abstract class MemoryManagerSourceSyncOps extends MemoryManagerSessionSyn
       this.workspaceDir,
       this.settings.extraPaths,
       this.settings.multimodal,
+      this.settings.excludePaths,
     );
     const fileEntries = (
       await runWithConcurrency(

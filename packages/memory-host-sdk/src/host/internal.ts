@@ -4,6 +4,7 @@ import fsSync from "node:fs";
 import fs from "node:fs/promises";
 import { homedir } from "node:os";
 import path from "node:path";
+import { minimatch } from "minimatch";
 import { normalizeStringEntries, uniqueStrings } from "@openclaw/normalization-core";
 import { runWithConcurrency as runWithConcurrencyImpl } from "./concurrency.js";
 import { MEMORY_HOST_ROOT_FILENAME } from "./config-utils.js";
@@ -103,6 +104,27 @@ export function normalizeExtraMemoryPaths(workspaceDir: string, extraPaths?: str
   return uniqueStrings(resolved);
 }
 
+function isExcludedPath(absPath: string, workspaceDir: string, excludePaths?: string[]): boolean {
+  if (!excludePaths?.length) {
+    return false;
+  }
+  const relPath = path.relative(workspaceDir, absPath).replace(/\\/g, "/");
+  for (const pattern of excludePaths) {
+    // minimatch glob match (supports **, *, etc.)
+    if (minimatch(relPath, pattern)) {
+      return true;
+    }
+    // Also treat plain directory paths as prefix matches (e.g. "memory/dreaming/light"
+    // should exclude all files underneath it, not just the directory entry itself).
+    // Only apply when the pattern contains no glob-special characters.
+    const hasGlobChars = /[*?[]/.test(pattern);
+    if (!hasGlobChars && relPath.startsWith(pattern + "/")) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function isMemoryPath(relPath: string): boolean {
   const normalized = normalizeRelPath(relPath);
   if (!normalized) {
@@ -154,6 +176,7 @@ export async function listMemoryFiles(
   workspaceDir: string,
   extraPaths?: string[],
   multimodal?: MemoryMultimodalSettings,
+  excludePaths?: string[],
 ): Promise<string[]> {
   const result: string[] = [];
   const memoryDir = path.join(workspaceDir, "memory");
@@ -209,6 +232,15 @@ export async function listMemoryFiles(
           result.push(inputPath);
         }
       } catch {}
+    }
+  }
+
+  // Apply excludePaths filtering (runs after shouldSkipRootMemoryAuxiliaryPath)
+  if (excludePaths?.length && result.length > 0) {
+    for (let i = result.length - 1; i >= 0; i--) {
+      if (isExcludedPath(result[i]!, workspaceDir, excludePaths)) {
+        result.splice(i, 1);
+      }
     }
   }
   if (result.length <= 1) {
