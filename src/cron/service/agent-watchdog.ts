@@ -103,11 +103,15 @@ export function createCronAgentWatchdog(params: {
     if (preExecutionTimeoutId || state !== "waiting_for_execution") {
       return;
     }
+    const delayMs = resolveCronAgentPreExecutionWatchdogMs(params.jobTimeoutMs);
+    // Absolute upper bound: never exceed the hard-coded cap regardless of
+    // resolveCronAgentPreExecutionWatchdogMs behavior.
+    const clampedMs = Math.min(delayMs, CRON_AGENT_PRE_EXECUTION_WATCHDOG_MS);
     preExecutionTimeoutId = setTimeout(() => {
       if (state === "waiting_for_execution") {
         setTimedOut(preExecutionTimeoutErrorMessage(activeExecution));
       }
-    }, resolveCronAgentPreExecutionWatchdogMs(params.jobTimeoutMs));
+    }, clampedMs);
   };
   const noteExecutionProgress = (info?: CronAgentExecutionStarted) => {
     if (!info) {
@@ -116,19 +120,6 @@ export function createCronAgentWatchdog(params: {
     const previousPhase = activeExecution?.phase;
     activeExecution = { ...activeExecution, ...info };
     const stage = info.phase ? CRON_AGENT_PHASE_WATCHDOG_STAGE[info.phase] : undefined;
-    // A fallback attempt can return to setup-like phases after execution began;
-    // re-arm pre-execution timing so the fallback path cannot stall silently.
-    if (
-      state === "executing" &&
-      previousPhase === "before_agent_reply" &&
-      stage === "pre_execution"
-    ) {
-      // Model fallback can move from an execution phase back into setup-like
-      // phases; restart the pre-execution watchdog so fallback stalls are seen.
-      state = "waiting_for_execution";
-      startPreExecutionTimeout();
-      return;
-    }
     if (stage === "execution" || info.firstModelCallStarted) {
       state = "executing";
       clearPreExecutionTimeout();
