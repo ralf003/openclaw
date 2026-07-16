@@ -418,7 +418,7 @@ describe("sanitizeToolResult", () => {
       command: "OPENAI_API_KEY=sk-abc123 ./run.sh",
     };
     const sanitized = sanitizeToolArgs(args) as typeof args;
-    expect(sanitized.headers.Authorization).toBe("Bearer abcdef0123456789QWERTY=");
+    expect(sanitized.headers.Authorization).toBe("***");
     expect(sanitized.command).toBe("OPENAI_API_KEY=sk-abc123 ./run.sh");
   });
 
