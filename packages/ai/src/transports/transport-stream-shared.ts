@@ -204,13 +204,15 @@ function normalizeTransportErrorBody(value: unknown): string | undefined {
   return redacted.length > 500 ? `${truncateUtf16Safe(redacted, 499)}…` : redacted;
 }
 
-function extractTransportErrorDetails(error: unknown): TransportErrorDetails {
+export function extractTransportErrorDetails(error: unknown): TransportErrorDetails {
   const errorObject = error && typeof error === "object" ? error : undefined;
   const nestedError = readObjectProperty(errorObject, "error");
+  const cause = readObjectProperty(errorObject, "cause");
   const errorCode =
     readStringLikeProperty(errorObject, "errorCode") ??
     readStringLikeProperty(errorObject, "code") ??
-    readStringLikeProperty(nestedError, "code");
+    readStringLikeProperty(nestedError, "code") ??
+    readStringLikeProperty(cause, "code");
   const errorType =
     readStringLikeProperty(errorObject, "errorType") ??
     readStringLikeProperty(errorObject, "type") ??
