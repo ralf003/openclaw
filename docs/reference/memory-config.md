@@ -398,9 +398,10 @@ And under `memorySearch.query.hybrid`:
 
 ## Additional memory paths
 
-| Key          | Type       | Description                              |
-| ------------ | ---------- | ---------------------------------------- |
-| `extraPaths` | `string[]` | Additional directories or files to index |
+| Key            | Type       | Description                              |
+| -------------- | ---------- | ---------------------------------------- |
+| `extraPaths`   | `string[]` | Additional directories or files to index |
+| `excludePaths` | `string[]` | Glob patterns to exclude from indexing   |
 
 ```json5
 {

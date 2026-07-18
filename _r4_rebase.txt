@@ -1,0 +1,22 @@
+I need you to perform a git rebase with conflict resolution.
+
+Current branch: feature/memory-search-exclude-paths-v2 (clean copy of upstream/main bcc44ba1b12)
+
+Steps:
+1. Run: git checkout feature/memory-search-exclude-paths
+2. Run: git rebase upstream/main
+3. When you hit a conflict, resolve it by reading the conflict markers and making a decision
+4. The 3 known conflict files are:
+   - extensions/memory-core/src/memory/manager-sync-ops.ts → Accept upstream (theirs) entirely. The PR's change (passing excludePaths to listMemoryFiles) needs to be applied to manager-source-sync-ops.ts instead, which we'll fix after rebase.
+   - packages/memory-host-sdk/src/host/internal.ts → Manually merge: keep upstream's import changes and body changes, add PR's minimatch import, isExcludedPath helper, excludePaths parameter, and filtering block.
+   - src/config/schema.help.ts → Accept upstream (theirs) entirely. Help text needs to go into schema.help.models.ts instead, which we'll fix after rebase.
+
+5. Use `git checkout --theirs` for files 1 and 3. For file 2, do a manual merge.
+6. After resolving, git add and git rebase --continue
+7. Keep going through all 6 commits
+8. After the rebase is complete, fix the follow-up items:
+   a. In manager-source-sync-ops.ts, find the listMemoryFiles call (~line 74) and add excludePaths as 4th arg
+   b. In schema.help.models.ts, add the excludePaths help entry next to extraPaths
+   c. Verify with: git diff upstream/main --stat
+
+DO it. Don't just explain - actually execute the rebase and resolve conflicts.

@@ -5,6 +5,7 @@ import fs from "node:fs/promises";
 import { homedir } from "node:os";
 import path from "node:path";
 import { normalizeStringEntries, uniqueStrings } from "@openclaw/normalization-core";
+import { minimatch } from "minimatch";
 import { runWithConcurrency as runWithConcurrencyImpl } from "./concurrency.js";
 import { MEMORY_HOST_ROOT_FILENAME } from "./config-utils.js";
 import { estimateStructuredEmbeddingInputBytes } from "./embedding-input-limits.js";
@@ -103,6 +104,18 @@ export function normalizeExtraMemoryPaths(workspaceDir: string, extraPaths?: str
   return uniqueStrings(resolved);
 }
 
+function isExcludedPath(relPath: string, excludePaths: string[] | undefined): boolean {
+  if (!excludePaths || excludePaths.length === 0) return false;
+  return excludePaths.some((pattern) => {
+    // Exact prefix match for plain directory paths (no glob chars)
+    if (!/[?*[]/.test(pattern)) {
+      return relPath === pattern || relPath.startsWith(pattern + "/");
+    }
+    // Glob match
+    return minimatch(relPath, pattern, { matchBase: false });
+  });
+}
+
 export function isMemoryPath(relPath: string): boolean {
   const normalized = normalizeRelPath(relPath);
   if (!normalized) {
@@ -154,6 +167,7 @@ export async function listMemoryFiles(
   workspaceDir: string,
   extraPaths?: string[],
   multimodal?: MemoryMultimodalSettings,
+  excludePaths?: string[],
 ): Promise<string[]> {
   const result: string[] = [];
   const memoryDir = path.join(workspaceDir, "memory");
@@ -211,6 +225,13 @@ export async function listMemoryFiles(
       } catch {}
     }
   }
+  // Apply excludePaths filtering
+  if (excludePaths && excludePaths.length > 0) {
+    const makeRel = (absPath: string) =>
+      path.relative(path.join(workspaceDir, "memory"), absPath).replace(/\\/g, "/");
+    result = result.filter((f) => !isExcludedPath(makeRel(f), excludePaths));
+  }
+
   if (result.length <= 1) {
     return result;
   }
@@ -457,11 +478,11 @@ export function chunkMarkdown(
       // Second pass: if a segment's *weighted* size still exceeds the budget
       // (happens for CJK-heavy text where 1 char ≈ 1 token), re-split it at
       // chunking.tokens so the chunk stays within the token budget.
-      for (let start = 0; start < line.length;) {
+      for (let start = 0; start < line.length; ) {
         const coarse = truncateUtf16Safe(line.slice(start), maxChars);
         if (estimateStringChars(coarse) > maxChars) {
           const fineStep = Math.max(1, chunking.tokens);
-          for (let j = 0; j < coarse.length;) {
+          for (let j = 0; j < coarse.length; ) {
             let end = Math.min(j + fineStep, coarse.length);
             const lastCodeUnit = coarse.charCodeAt(end - 1);
             if (lastCodeUnit >= 0xd800 && lastCodeUnit <= 0xdbff && end < coarse.length) {

@@ -32,6 +32,7 @@ export type ResolvedMemorySearchConfig = {
   enabled: boolean;
   sources: Array<"memory" | "sessions">;
   extraPaths: string[];
+  excludePaths: string[];
   multimodal: MemoryMultimodalSettings;
   provider: string;
   remote?: {
@@ -294,6 +295,9 @@ function mergeConfig(
     ...(overrides?.extraPaths ?? []),
   ]);
   const extraPaths = uniqueStrings(rawPaths);
+  const excludePaths = uniqueStrings(
+    normalizeStringEntries([...(defaults?.excludePaths ?? []), ...(overrides?.excludePaths ?? [])]),
+  );
   const multimodal = normalizeMemoryMultimodalSettings({
     enabled: overrides?.multimodal?.enabled ?? defaults?.multimodal?.enabled,
     modalities: overrides?.multimodal?.modalities ?? defaults?.multimodal?.modalities,
@@ -388,6 +392,7 @@ function mergeConfig(
     enabled,
     sources,
     extraPaths,
+    excludePaths,
     multimodal,
     provider,
     remote,

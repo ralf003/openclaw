@@ -298,4 +298,50 @@ describe("memory host SDK package internals", () => {
       expectDefined(chunks[chunks.length - 1], "chunks[chunks.length - 1] test invariant").endLine,
     ).toBe(13);
   });
+
+  describe("excludePaths", () => {
+    it("excludes files matching exact path", async () => {
+      const files = await listMemoryFiles(tmpdir, undefined, undefined, ["MEMORY.md"]);
+      expect(files.map((f) => f.relativePath)).not.toContain("MEMORY.md");
+    });
+
+    it("excludes files under a plain directory prefix", async () => {
+      const subdir = path.join(tmpdir, "sub");
+      fs.mkdirSync(subdir);
+      fs.writeFileSync(path.join(subdir, "a.md"), "content a");
+      const files = await listMemoryFiles(tmpdir, undefined, undefined, ["sub"]);
+      const paths = files.map((f) => f.relativePath);
+      expect(paths).not.toContain("sub/a.md");
+    });
+
+    it("excludes files matching glob wildcard", async () => {
+      const archiveDir = path.join(tmpdir, "archive");
+      fs.mkdirSync(archiveDir);
+      fs.writeFileSync(path.join(archiveDir, "old.md"), "old");
+      const files = await listMemoryFiles(tmpdir, undefined, undefined, ["archive/**"]);
+      const paths = files.map((f) => f.relativePath);
+      expect(paths).not.toContain("archive/old.md");
+    });
+
+    it("retains non-excluded files alongside excluded ones", async () => {
+      const keepFile = path.join(tmpdir, "keep.md");
+      fs.writeFileSync(keepFile, "keep");
+      const files = await listMemoryFiles(tmpdir, undefined, undefined, ["MEMORY.md"]);
+      const paths = files.map((f) => f.relativePath);
+      expect(paths).toContain("keep.md");
+      expect(paths).not.toContain("MEMORY.md");
+    });
+
+    it("empty excludePaths retains all files", async () => {
+      const files = await listMemoryFiles(tmpdir, undefined, undefined, []);
+      const paths = files.map((f) => f.relativePath);
+      expect(paths).toContain("MEMORY.md");
+    });
+
+    it("no excludePaths parameter retains all files", async () => {
+      const files = await listMemoryFiles(tmpdir);
+      const paths = files.map((f) => f.relativePath);
+      expect(paths).toContain("MEMORY.md");
+    });
+  });
 });

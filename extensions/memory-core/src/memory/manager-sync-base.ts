@@ -427,6 +427,7 @@ export abstract class MemoryManagerSyncBase {
       configuredScopeHash: resolveConfiguredScopeHash({
         workspaceDir: this.workspaceDir,
         extraPaths: this.settings.extraPaths,
+        excludePaths: this.settings.excludePaths,
         multimodal: {
           enabled: this.settings.multimodal.enabled,
           modalities: this.settings.multimodal.modalities,
