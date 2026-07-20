@@ -43,6 +43,8 @@ import {
 
 export type { MemoryIndexWorkItem } from "./manager-sync-base.js";
 
+const log = createSubsystemLogger("memory");
+
 export abstract class MemoryManagerSyncOps extends MemoryManagerSourceSyncOps {
   private createSyncProgress(
     onProgress: (update: MemorySyncProgressUpdate) => void,
