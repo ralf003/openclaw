@@ -2166,6 +2166,9 @@ importers:
       '@openclaw/retry':
         specifier: workspace:*
         version: link:../retry
+      minimatch:
+        specifier: 10.2.5
+        version: 10.2.5
       p-map:
         specifier: 7.0.5
         version: 7.0.5
