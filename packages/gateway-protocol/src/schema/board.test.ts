@@ -2,6 +2,8 @@ import { Value } from "typebox/value";
 import { describe, expect, it } from "vitest";
 import {
   BoardSnapshotSchema,
+  BoardWidgetAppViewParamsSchema,
+  BoardWidgetAppViewResultSchema,
   BoardWidgetGrantParamsSchema,
   BoardWidgetPutParamsSchema,
 } from "./board.js";
@@ -23,7 +25,13 @@ describe("BoardSnapshotSchema", () => {
           grantState: "none",
           revision: 1,
           declaredSummary: ["Network access: https://example.com"],
+          declared: { netOrigins: ["https://example.com"], tools: ["health"] },
           frameUrl: "/__openclaw__/board/agent%3Amain%3Amain/status/index.html?bt=ticket",
+          viewTicket: "v1.ticket.signature",
+          viewTicketTtlMs: 60_000,
+          viewGeneration: "a".repeat(32),
+          sandboxUrl: "/mcp-app-sandbox?csp=encoded",
+          sandboxPort: 18790,
         },
       ],
     };
@@ -38,6 +46,12 @@ describe("BoardSnapshotSchema", () => {
       Value.Check(BoardSnapshotSchema, {
         ...snapshot,
         widgets: [{ ...snapshot.widgets[0], declaredSummary: [42] }],
+      }),
+    ).toBe(false);
+    expect(
+      Value.Check(BoardSnapshotSchema, {
+        ...snapshot,
+        widgets: [{ ...snapshot.widgets[0], viewGeneration: "not-a-generation" }],
       }),
     ).toBe(false);
   });
@@ -62,6 +76,12 @@ describe("BoardSnapshotSchema", () => {
     };
 
     expect(Value.Check(BoardSnapshotSchema, snapshot)).toBe(true);
+    expect(
+      Value.Check(BoardSnapshotSchema, {
+        ...snapshot,
+        widgets: [{ ...widget, instanceId: "widget-instance" }],
+      }),
+    ).toBe(true);
   });
 });
 
@@ -75,16 +95,70 @@ describe("BoardWidgetPutParamsSchema", () => {
       }),
     ).toBe(true);
   });
+
+  it("requires an active source view for MCP App pins", () => {
+    const pin = {
+      sessionKey: "agent:main:main",
+      name: "weather-app",
+      content: {
+        kind: "mcp-app",
+        viewId: "mcp-app-source",
+      },
+    };
+    expect(Value.Check(BoardWidgetPutParamsSchema, pin)).toBe(true);
+    expect(
+      Value.Check(BoardWidgetPutParamsSchema, {
+        ...pin,
+        content: { ...pin.content, viewId: undefined },
+      }),
+    ).toBe(false);
+    expect(
+      Value.Check(BoardWidgetPutParamsSchema, {
+        ...pin,
+        content: {
+          kind: "mcp-app",
+          descriptor: { viewId: "mcp-app-source" },
+        },
+      }),
+    ).toBe(false);
+  });
+});
+
+describe("BoardWidgetAppView schemas", () => {
+  it("binds lease requests to a board widget and returns its expiry", () => {
+    expect(
+      Value.Check(BoardWidgetAppViewParamsSchema, {
+        sessionKey: "agent:main:main",
+        name: "weather-app",
+        revision: 3,
+        instanceId: "widget-instance",
+      }),
+    ).toBe(true);
+    expect(
+      Value.Check(BoardWidgetAppViewParamsSchema, {
+        sessionKey: "agent:main:main",
+        name: "weather-app",
+        revision: 3,
+      }),
+    ).toBe(false);
+    expect(
+      Value.Check(BoardWidgetAppViewResultSchema, {
+        viewId: "mcp-app-fresh",
+        expiresAtMs: 1_800_000,
+      }),
+    ).toBe(true);
+  });
 });
 
 describe("BoardWidgetGrantParamsSchema", () => {
-  it("requires the widget revision being approved", () => {
+  it("requires the widget revision and instance being approved", () => {
     expect(
       Value.Check(BoardWidgetGrantParamsSchema, {
         sessionKey: "agent:main:main",
         name: "status",
         decision: "granted",
         revision: 1,
+        instanceId: "widget-instance",
       }),
     ).toBe(true);
     expect(
@@ -92,6 +166,15 @@ describe("BoardWidgetGrantParamsSchema", () => {
         sessionKey: "agent:main:main",
         name: "status",
         decision: "granted",
+        revision: 1,
+      }),
+    ).toBe(false);
+    expect(
+      Value.Check(BoardWidgetGrantParamsSchema, {
+        sessionKey: "agent:main:main",
+        name: "status",
+        decision: "granted",
+        instanceId: "widget-instance",
       }),
     ).toBe(false);
   });

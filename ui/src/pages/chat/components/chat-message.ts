@@ -642,6 +642,7 @@ type StreamGroupOptions = {
   authToken?: string | null;
   planStatus?: PlanStatus | null;
   planActive?: boolean;
+  waitingApproval?: boolean;
   questionPrompts?: ReadonlyMap<string, QuestionPrompt>;
 };
 
@@ -680,7 +681,7 @@ export function renderStreamGroup(parts: StreamGroupPart[], opts: StreamGroupOpt
       <div class="chat-group-messages">
         ${parts.map((part) =>
           part.kind === "reading-indicator"
-            ? renderChatWorkingIndicator(part)
+            ? renderChatWorkingIndicator(part, opts.waitingApproval === true)
             : part.kind === "question"
               ? renderQuestionStreamPart(part, opts)
               : part.kind === "plan"
@@ -781,6 +782,7 @@ type RenderMessageGroupOptions = {
   onAssistantAttachmentLoaded?: () => void;
   assistantName?: string;
   assistantAvatar?: string | null;
+  userId?: string | null;
   userName?: string | null;
   userAvatar?: string | null;
   basePath?: string;
@@ -839,9 +841,12 @@ export function renderMessageGroup(group: MessageGroup, opts: RenderMessageGroup
     avatar: opts.userAvatar ?? null,
   });
   const userLabel = group.senderLabel?.trim();
+  const isCurrentUser = opts.userId && group.sender?.id === opts.userId;
   const who =
     normalizedRole === "user"
-      ? (userLabel ?? resolvedUserName)
+      ? isCurrentUser
+        ? resolvedUserName
+        : (userLabel ?? resolvedUserName)
       : normalizedRole === "assistant"
         ? (userLabel ?? assistantName)
         : normalizedRole === "tool"

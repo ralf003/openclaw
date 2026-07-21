@@ -899,7 +899,7 @@ describe("direct thread avatar mode", () => {
       sessionKey: "kind-direct",
       sessions: sessionsListWithKind("kind-direct", "direct"),
       messages: labeledHistory,
-      attributedIdentity: true,
+      userId: "profile-1",
     });
     // Multi-user gateways share even 1:1-shaped sessions, so the author
     // marker is signal, not decoration.
@@ -1727,6 +1727,34 @@ describe("per-pane chat presentation state", () => {
 });
 
 describe("chat transcript rendering cache", () => {
+  it("rerenders transcript groups when the current profile id arrives", () => {
+    const messages = [{ role: "user", content: "hi" }];
+    vi.mocked(chatThread.buildCachedChatItems).mockReturnValue([
+      {
+        kind: "group",
+        key: "group:user:test",
+        role: "user",
+        messages: [{ key: "message:user:test", message: messages[0] }],
+        timestamp: 1,
+        isStreaming: false,
+      },
+    ]);
+    const transcript = new ChatTranscriptController({
+      addController: () => undefined,
+      removeController: () => undefined,
+      requestUpdate: () => undefined,
+      updateComplete: Promise.resolve(true),
+    } satisfies ReactiveControllerHost);
+    const props = createChatProps({ messages, transcript, userName: "Fuller Stack" });
+    const container = document.createElement("div");
+
+    render(renderChat(props), container);
+    render(renderChat({ ...props, userId: "profile-1" }), container);
+
+    expect(renderMessageGroupMock).toHaveBeenCalledTimes(2);
+    expect(renderMessageGroupMock.mock.calls[1]?.[1]).toMatchObject({ userId: "profile-1" });
+  });
+
   it("rerenders transcript groups when assistant attachment availability changes", () => {
     const messages = [{ role: "assistant", content: "ready" }];
     const toolMessages: unknown[] = [];
@@ -3326,6 +3354,31 @@ describe("chat attachment picker", () => {
     expect(chat.hasAttribute("data-attachment-drop-active")).toBe(false);
   });
 
+  it("cancels non-file drops outside the composer textarea but keeps them native inside it", () => {
+    const container = renderChatView();
+    const chat = requireElement(container, "section.card.chat", "chat drop target");
+    const textarea = requireElement(
+      container,
+      ".agent-chat__composer-combobox > textarea",
+      "composer textarea",
+    );
+
+    const outsideDrop = createDragEvent("drop", ["text/uri-list"]);
+    chat.dispatchEvent(outsideDrop);
+    expect(outsideDrop.defaultPrevented).toBe(true);
+
+    const textareaDrop = createDragEvent("drop", ["text/uri-list"]);
+    textarea.dispatchEvent(textareaDrop);
+    expect(textareaDrop.defaultPrevented).toBe(false);
+
+    const range = document.createElement("input");
+    range.type = "range";
+    chat.append(range);
+    const rangeDrop = createDragEvent("drop", ["text/uri-list"]);
+    range.dispatchEvent(rangeDrop);
+    expect(rangeDrop.defaultPrevented).toBe(true);
+  });
+
   it("turns large pasted plain text into a compact attachment", async () => {
     const onAttachmentsChange = vi.fn();
     const container = renderChatView({
@@ -3490,7 +3543,9 @@ describe("chat attachment picker", () => {
     });
     const droppedFile = new File(["%PDF-1.4\n"], "brief.pdf", { type: "application/pdf" });
     const dropEvent = new Event("drop", { bubbles: true, cancelable: true });
-    Object.defineProperty(dropEvent, "dataTransfer", { value: { files: [droppedFile] } });
+    Object.defineProperty(dropEvent, "dataTransfer", {
+      value: { files: [droppedFile], types: ["Files"] },
+    });
 
     try {
       textarea.dispatchEvent(pasteEvent);
@@ -5412,6 +5467,27 @@ describe("right-click Reply", () => {
       "reply target",
     );
     expect(target.text).toBe("x".repeat(499));
+  });
+
+  it("keeps the native context menu for links inside a replyable bubble", () => {
+    const container = renderChatView({ onSetReply: vi.fn() });
+    const group = document.createElement("div");
+    group.className = "chat-group";
+    const bubble = document.createElement("div");
+    bubble.className = "chat-bubble";
+    bubble.dataset.messageText = "hello world";
+    const link = document.createElement("a");
+    link.href = "https://example.com";
+    link.textContent = "Example";
+    bubble.appendChild(link);
+    group.appendChild(bubble);
+    container.querySelector(".chat-thread-inner")!.appendChild(group);
+
+    const evt = new MouseEvent("contextmenu", { bubbles: true, cancelable: true });
+    link.dispatchEvent(evt);
+
+    expect(evt.defaultPrevented).toBe(false);
+    expect(document.querySelector(".chat-reply-context-menu")).toBeNull();
   });
 
   it("keeps the native context menu when Reply is unavailable", () => {

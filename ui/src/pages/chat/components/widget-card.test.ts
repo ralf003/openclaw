@@ -2,7 +2,7 @@
 
 import { render } from "lit";
 import { describe, expect, it, vi } from "vitest";
-import type { BoardProvider } from "../../../lib/board/provider.ts";
+import { mcpAppWidgetNameForViewId, type BoardProvider } from "../../../lib/board/provider.ts";
 import { renderToolPreview } from "./widget-card.ts";
 
 describe("widget-card", () => {
@@ -53,7 +53,7 @@ describe("widget-card", () => {
     expect(unknown.childElementCount).toBe(0);
   });
 
-  it("pins Canvas HTML through the board provider and hides the action for MCP Apps", async () => {
+  it("pins normalized Canvas HTML through the board provider", async () => {
     const pinWidget = vi.fn(async () => undefined);
     const snapshotSignal = {
       value: {
@@ -65,6 +65,7 @@ describe("widget-card", () => {
       subscribe: () => () => {},
     };
     const provider = {
+      sessionKey: "agent:main:main",
       canPinWidgets: true,
       pinWidget,
       snapshot$: snapshotSignal,
@@ -77,7 +78,7 @@ describe("widget-card", () => {
           surface: "assistant_message",
           render: "url",
           title: "Release status",
-          viewId: "cv_release",
+          viewId: " cv_release ",
           url: "/__openclaw__/canvas/documents/cv_release/index.html",
           sandbox: "scripts",
         },
@@ -203,5 +204,77 @@ describe("widget-card", () => {
       app,
     );
     expect(app.querySelector("[data-pin-widget]")).toBeNull();
+  });
+
+  it("pins an MCP App using only its view identity", async () => {
+    const pinMcpApp = vi.fn(async () => undefined);
+    const provider = {
+      sessionKey: "agent:main:main",
+      canPinWidgets: true,
+      canPinMcpApps: true,
+      pinMcpApp,
+      snapshot$: {
+        value: {
+          sessionKey: "agent:main:main",
+          revision: 0,
+          tabs: [],
+          widgets: [],
+        },
+        subscribe: () => () => {},
+      },
+    } as unknown as BoardProvider;
+    const preview = {
+      kind: "canvas" as const,
+      surface: "assistant_message" as const,
+      render: "url" as const,
+      title: "Weather",
+      mcpApp: {
+        viewId: " mcp-app-source ",
+        serverName: "weather",
+        toolName: "show",
+        uiResourceUri: "ui://weather/app",
+        toolCallId: "call-1",
+        originSessionKey: "agent:main:main",
+      },
+    };
+
+    const origin = document.createElement("div");
+    render(
+      renderToolPreview(preview, "chat_message", {
+        boardProvider: provider,
+        sessionKey: "agent:main:main",
+      }),
+      origin,
+    );
+    origin.querySelector<HTMLButtonElement>("[data-pin-widget]")?.click();
+    await vi.waitFor(() =>
+      expect(pinMcpApp).toHaveBeenCalledWith({
+        viewId: "mcp-app-source",
+        name: mcpAppWidgetNameForViewId("mcp-app-source"),
+        title: "Weather",
+      }),
+    );
+
+    const unsupportedProvider = { ...provider, canPinMcpApps: false } as BoardProvider;
+    const unsupported = document.createElement("div");
+    render(
+      renderToolPreview(preview, "chat_message", {
+        boardProvider: unsupportedProvider,
+        sessionKey: "agent:main:main",
+      }),
+      unsupported,
+    );
+    expect(unsupported.querySelector("[data-pin-widget]")).toBeNull();
+
+    const missingView = document.createElement("div");
+    render(
+      renderToolPreview(
+        { ...preview, mcpApp: { ...preview.mcpApp, viewId: "   " } },
+        "chat_message",
+        { boardProvider: provider, sessionKey: "agent:main:main" },
+      ),
+      missingView,
+    );
+    expect(missingView.querySelector("[data-pin-widget]")).toBeNull();
   });
 });

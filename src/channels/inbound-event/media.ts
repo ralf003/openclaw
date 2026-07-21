@@ -24,7 +24,7 @@ export type MediaPlaceholderTextFact = Readonly<
   Pick<ChannelInboundMediaInput, "contentType" | "kind" | "path" | "url">
 >;
 
-type MediaPlaceholderKind = "attachment" | "audio" | "document" | "image" | "video";
+type MediaPlaceholderKind = "attachment" | "audio" | "document" | "image" | "sticker" | "video";
 
 function resolveMediaPlaceholderKind(media: MediaPlaceholderTextFact): MediaPlaceholderKind {
   if (media.kind && media.kind !== "unknown") {
@@ -43,6 +43,7 @@ const PLURAL_MEDIA_PLACEHOLDER_LABELS: Readonly<Record<MediaPlaceholderKind, str
   video: "videos",
   audio: "audio attachments",
   document: "files",
+  sticker: "stickers",
   attachment: "attachments",
 };
 
@@ -77,19 +78,14 @@ export type ChannelInboundMediaPayload = {
   MediaTranscribedIndexes?: number[];
 };
 
-/**
- * Replaces an optimistic media placeholder, or appends to real caption text,
- * when transport media could not be materialized for the agent turn.
- */
+/** Appends an unavailable-media notice to real caption text, or returns the notice alone. */
 export function formatInboundMediaUnavailableText(params: {
   body?: string | null;
-  mediaPlaceholder?: string | null;
   notice: string;
 }): string {
   const body = params.body?.trim() ?? "";
-  const placeholder = params.mediaPlaceholder?.trim() ?? "";
   const notice = params.notice.trim();
-  if (!body || (placeholder && body === placeholder)) {
+  if (!body) {
     return notice;
   }
   return `${body}\n\n${notice}`;

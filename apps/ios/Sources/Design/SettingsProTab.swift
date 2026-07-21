@@ -159,9 +159,9 @@ struct SettingsProTab: View {
         }
         .toolbar {
             if let headerSidebarAction {
-                ToolbarItem(placement: .topBarLeading) {
-                    OpenClawSidebarRevealButton(action: headerSidebarAction)
-                }
+                OpenClawSidebarToolbarItem(
+                    action: headerSidebarAction,
+                    placement: .topBarLeading)
             }
         }
     }
@@ -351,7 +351,7 @@ struct SettingsProTab: View {
                     titleVisibility: .visible)
             {
                 Button(role: .destructive) {
-                    self.forgetPendingGateway()
+                    Task { await self.forgetPendingGateway() }
                 } label: {
                     Text("Forget Gateway")
                         .font(OpenClawType.subheadSemiBold)

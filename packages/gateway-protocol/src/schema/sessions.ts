@@ -1,6 +1,7 @@
 // Gateway Protocol schema module defines protocol validation shapes.
 import type { Static } from "typebox";
 import { Type } from "typebox";
+import { SESSION_AGENT_ATTENTION_ICON_IDS } from "../session-icon.js";
 import { closedObject } from "./closed-object.js";
 import { ErrorShapeSchema } from "./frames.js";
 import { PluginJsonValueSchema } from "./plugins.js";
@@ -369,6 +370,15 @@ export const SessionsPatchParamsSchema = closedObject({
       description: "Sidebar icon: one emoji, name:<id>, or svg:<svg ...>...</svg>.",
     }),
   ),
+  statusNote: Type.Optional(
+    Type.Union([Type.String({ maxLength: 120 }), Type.Null()], {
+      description: "Short expiring sidebar status note; null clears it and any declared attention.",
+    }),
+  ),
+  attention: Type.Optional(
+    Type.Union([Type.String({ enum: [...SESSION_AGENT_ATTENTION_ICON_IDS] }), Type.Null()]),
+  ),
+  ttlMinutes: Type.Optional(Type.Integer({ minimum: 1, maximum: 120 })),
   archived: Type.Optional(Type.Boolean()),
   pinned: Type.Optional(Type.Boolean()),
   unread: Type.Optional(
@@ -396,6 +406,7 @@ export const SessionsPatchParamsSchema = closedObject({
   execNode: Type.Optional(Type.Union([NonEmptyString, Type.Null()])),
   model: Type.Optional(Type.Union([NonEmptyString, Type.Null()])),
   spawnedBy: Type.Optional(Type.Union([NonEmptyString, Type.Null()])),
+  completionOwnerSessionKey: Type.Optional(Type.Union([NonEmptyString, Type.Null()])),
   spawnedWorkspaceDir: Type.Optional(Type.Union([NonEmptyString, Type.Null()])),
   spawnedCwd: Type.Optional(Type.Union([NonEmptyString, Type.Null()])),
   spawnDepth: Type.Optional(Type.Union([Type.Integer({ minimum: 0 }), Type.Null()])),
@@ -405,6 +416,7 @@ export const SessionsPatchParamsSchema = closedObject({
   subagentControlScope: Type.Optional(
     Type.Union([Type.Literal("children"), Type.Literal("none"), Type.Null()]),
   ),
+  inheritedToolPolicyVersion: Type.Optional(Type.Union([Type.Literal(1), Type.Null()])),
   inheritedToolAllow: Type.Optional(Type.Union([Type.Array(NonEmptyString), Type.Null()])),
   inheritedToolDeny: Type.Optional(Type.Union([Type.Array(NonEmptyString), Type.Null()])),
   sendPolicy: Type.Optional(Type.Union([Type.Literal("allow"), Type.Literal("deny"), Type.Null()])),

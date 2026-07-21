@@ -35,6 +35,11 @@ export type AgentCommandResultMetaOverrides = {
   fallbackReason?: "gateway_timeout" | "gateway_closed";
   fallbackSessionId?: string;
   fallbackSessionKey?: string;
+  fallback?: {
+    reason: "gateway_timeout" | "gateway_closed";
+    requestedSessionKey: string | null;
+    sessionKey: string;
+  };
 };
 
 /** ACP turn source markers accepted by trusted command callsites. */
@@ -117,6 +122,8 @@ export type AgentCommandOpts = {
   toolsAllow?: string[];
   /** Trusted owner-scoped plugin tool grant; normal policy and deny rules still apply. */
   runtimePluginToolGrant?: RuntimePluginToolGrant;
+  /** Trusted in-process subagent-completion handoff; never accepted from public RPC params. */
+  trustedInternalHandoff?: boolean;
   /** Internal marker for an auto-applied cap that CLI runtimes must omit. */
   toolsAllowIsDefault?: boolean;
   /** Preserve the originating run's message-tool policy across internal continuation turns. */

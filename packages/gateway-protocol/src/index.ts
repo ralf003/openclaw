@@ -1,6 +1,10 @@
 export * from "./clawhub-trust-error-details.js";
 export * from "./system-agent-error-details.js";
-export { readMissingScopeError, readMissingScopeErrorDetails } from "./gateway-error-details.js";
+export {
+  isMcpAppViewExpiredError,
+  readMissingScopeError,
+  readMissingScopeErrorDetails,
+} from "./gateway-error-details.js";
 export * from "./session-icon.js";
 export * from "./terminal-validators.js";
 export {
@@ -15,15 +19,23 @@ export type { ProtocolValidator } from "./protocol-validator.js";
 export * from "./schema/worker-inference.js";
 export * from "./schema/skill-history.js";
 export * from "./schema/ui-command.js";
-export type { GatewayErrorDetails, MissingScopeErrorDetails } from "./schema/error-codes.js";
+export type {
+  GatewayErrorDetails,
+  McpAppViewExpiredErrorDetails,
+  MissingScopeErrorDetails,
+} from "./schema/error-codes.js";
 export * from "./schema/board.js";
 export * from "./migration-api.js";
 export type * from "./public-session-catalog.js";
 import {
+  BoardActionParamsSchema,
+  BoardDataReadParamsSchema,
   BoardEventParamsSchema,
   BoardGetParamsSchema,
+  BoardPromptAuthorizeParamsSchema,
   BoardUpdateParamsSchema,
   BoardWidgetContentSchema,
+  BoardWidgetAppViewParamsSchema,
   BoardWidgetGrantParamsSchema,
   BoardWidgetPutParamsSchema,
   AgentEventSchema,
@@ -53,6 +65,7 @@ import {
   AgentIdentityResultSchema,
   AgentParamsSchema,
   MessageActionParamsSchema,
+  AgentKindSchema,
   AgentSummarySchema,
   AgentsFileEntrySchema,
   AgentsCreateParamsSchema,
@@ -335,6 +348,8 @@ import {
   TerminalUploadParamsSchema,
   TerminalUploadResultSchema,
   UiCommandParamsSchema,
+  ModelsAuthLogoutParamsSchema,
+  ModelsAuthStatusParamsSchema,
   ModelsListParamsSchema,
   AuthProbeStatusSchema,
   ModelsProbeParamsSchema,
@@ -671,9 +686,13 @@ export const validateWorktreesListParams = lazyCompile(WorktreesListParamsSchema
 export const validateBoardGetParams = lazyCompile(BoardGetParamsSchema);
 export const validateBoardUpdateParams = lazyCompile(BoardUpdateParamsSchema);
 export const validateBoardWidgetContent = lazyCompile(BoardWidgetContentSchema);
+export const validateBoardWidgetAppViewParams = lazyCompile(BoardWidgetAppViewParamsSchema);
 export const validateBoardWidgetPutParams = lazyCompile(BoardWidgetPutParamsSchema);
 export const validateBoardWidgetGrantParams = lazyCompile(BoardWidgetGrantParamsSchema);
 export const validateBoardEventParams = lazyCompile(BoardEventParamsSchema);
+export const validateBoardPromptAuthorizeParams = lazyCompile(BoardPromptAuthorizeParamsSchema);
+export const validateBoardDataReadParams = lazyCompile(BoardDataReadParamsSchema);
+export const validateBoardActionParams = lazyCompile(BoardActionParamsSchema);
 export const validateWorktreesCreateParams = lazyCompile(WorktreesCreateParamsSchema);
 export const validateWorktreesRemoveParams = lazyCompile(WorktreesRemoveParamsSchema);
 export const validateWorktreesRestoreParams = lazyCompile(WorktreesRestoreParamsSchema);
@@ -845,6 +864,8 @@ export const validateChannelsStatusParams = lazyCompile(ChannelsStatusParamsSche
 export const validateChannelsStartParams = lazyCompile(ChannelsStartParamsSchema);
 export const validateChannelsStopParams = lazyCompile(ChannelsStopParamsSchema);
 export const validateChannelsLogoutParams = lazyCompile(ChannelsLogoutParamsSchema);
+export const validateModelsAuthLogoutParams = lazyCompile(ModelsAuthLogoutParamsSchema);
+export const validateModelsAuthStatusParams = lazyCompile(ModelsAuthStatusParamsSchema);
 export const validateModelsListParams = lazyCompile(ModelsListParamsSchema);
 export const validateSkillsStatusParams = lazyCompile(SkillsStatusParamsSchema);
 export const validateToolsCatalogParams = lazyCompile(ToolsCatalogParamsSchema);
@@ -1259,6 +1280,7 @@ export {
   ChannelsLogoutParamsSchema,
   WebLoginStartParamsSchema,
   WebLoginWaitParamsSchema,
+  AgentKindSchema,
   AgentSummarySchema,
   AgentsFileEntrySchema,
   AgentsCreateParamsSchema,
@@ -1303,6 +1325,8 @@ export {
   PluginsUiDescriptorsResultSchema,
   PluginsUninstallParamsSchema,
   PluginsUninstallResultSchema,
+  ModelsAuthLogoutParamsSchema,
+  ModelsAuthStatusParamsSchema,
   ModelsListParamsSchema,
   AuthProbeStatusSchema,
   ModelsProbeParamsSchema,
@@ -1597,6 +1621,7 @@ export type {
   ChannelsLogoutParams,
   WebLoginStartParams,
   WebLoginWaitParams,
+  AgentKind,
   AgentSummary,
   AgentsFileEntry,
   AgentsCreateParams,
