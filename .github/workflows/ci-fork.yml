@@ -1,13 +1,13 @@
 name: Fork CI
 
-# Simplified CI for the ralf003/openclaw fork.
-# Runs on push to any branch and on pull requests.
-# Only essential jobs: lint, build, test.
+# CI for ralf003/openclaw fork.
+# Covers the same checks as upstream openclaw/openclaw ci.yml, minus jobs
+# that require openclaw-org secrets (ClawSweeper, Dependency Guard, PR CI
+# Sweeper, macOS/iOS/Android runners).
 
 on:
-  workflow_dispatch:
   push:
-    branches: ['**']  # all branches
+    branches: ['**']
     paths-ignore:
       - '**.md'
       - 'docs/**'
@@ -23,14 +23,17 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 jobs:
+  # ----------------------------------------------------------------------
+  # 1. Lint — ESLint / oxlint (same as upstream checks-fast-core lint shard)
+  # ----------------------------------------------------------------------
   lint:
     name: Lint
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+      - uses: actions/setup-node@v4
         with:
           node-version: '24.x'
 
@@ -40,7 +43,7 @@ jobs:
           corepack prepare --activate
 
       - name: Cache pnpm store
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        uses: actions/cache@v4
         with:
           path: ~/.local/share/pnpm/store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
@@ -55,14 +58,17 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-  build:
-    name: Build
+  # ----------------------------------------------------------------------
+  # 2. Format check — oxfmt (same as upstream check-docs format step)
+  # ----------------------------------------------------------------------
+  format-check:
+    name: Format Check
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+      - uses: actions/setup-node@v4
         with:
           node-version: '24.x'
 
@@ -72,7 +78,209 @@ jobs:
           corepack prepare --activate
 
       - name: Cache pnpm store
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          CI: 'true'
+
+      - name: Format check
+        run: pnpm format:check
+
+  # ----------------------------------------------------------------------
+  # 3. Docs check — same as upstream check-docs
+  # ----------------------------------------------------------------------
+  docs-check:
+    name: Docs Check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare --activate
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          CI: 'true'
+
+      - name: Docs format check
+        run: pnpm format:docs:check
+
+      - name: Docs lint
+        run: pnpm lint:docs
+
+      - name: Docs MDX check
+        run: pnpm docs:check-mdx
+
+      - name: Docs links check
+        run: pnpm docs:check-links
+
+      - name: Docs map check
+        run: pnpm docs:map:check
+
+  # ----------------------------------------------------------------------
+  # 4. Shrinkwrap check — same as upstream check-shard deps:shrinkwrap
+  # ----------------------------------------------------------------------
+  shrinkwrap-check:
+    name: Shrinkwrap Check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare --activate
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          CI: 'true'
+
+      - name: Shrinkwrap check
+        run: pnpm deps:shrinkwrap:root:check
+
+  # ----------------------------------------------------------------------
+  # 5. Bundle metadata check — same as upstream check-shard
+  # ----------------------------------------------------------------------
+  bundle-check:
+    name: Bundle Metadata Check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare --activate
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          CI: 'true'
+
+      - name: Bundle channel config metadata check
+        run: pnpm check:bundled-channel-config-metadata
+
+  # ----------------------------------------------------------------------
+  # 6. Dependency guard — detect pnpm-lock.yaml / package.json changes
+  #    Mirrors upstream dependency-guard.yml behavior (without App token)
+  # ----------------------------------------------------------------------
+  dep-guard:
+    name: Dependency Guard
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect dependency changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Get the merge-base with the target branch
+          if [[ -n "${GITHUB_BASE_REF:-}" ]]; then
+            TARGET="${GITHUB_BASE_REF}"
+          else
+            TARGET="main"
+          fi
+          git fetch origin "$TARGET" --depth=50 2>/dev/null || true
+          BASE=$(git merge-base "origin/$TARGET" HEAD 2>/dev/null || echo "")
+          
+          if [[ -z "$BASE" ]]; then
+            echo "::warning::Could not determine merge-base, skipping dependency guard"
+            exit 0
+          fi
+          
+          echo "Checking dependency changes against $BASE"
+          CHANGED=$(git diff --name-only "$BASE" HEAD | grep -E 'pnpm-lock\.yaml|package\.json' || true)
+          
+          if [[ -n "$CHANGED" ]]; then
+            echo "::warning::Dependency graph files changed:"
+            echo "$CHANGED"
+            echo ""
+            echo "::warning::UPSTREAM WILL BLOCK: openclaw/openclaw does not accept"
+            echo "::warning::dependency changes through PRs without maintainer approval."
+            echo "::warning::"
+            echo "::warning::Mitigation:"
+            echo "::warning::  1. Ensure changes are intentional and minimal"
+            echo "::warning::  2. Comment /allow-dependencies-change on the upstream PR"
+            echo "::warning::  3. Or ask a secops maintainer to approve"
+            echo "::notice title=Dependency Change Detected::pnpm-lock.yaml or package.json modified. Upstream CI will block without /allow-dependencies-change."
+          else
+            echo "No dependency graph changes detected. OK."
+          fi
+
+  # ----------------------------------------------------------------------
+  # 7. Build — same as upstream build-artifacts
+  # ----------------------------------------------------------------------
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare --activate
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
         with:
           path: ~/.local/share/pnpm/store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
@@ -89,14 +297,17 @@ jobs:
         env:
           NODE_OPTIONS: '--max-old-space-size=8192'
 
+  # ----------------------------------------------------------------------
+  # 8. Test — same as upstream check-shard (core test shard)
+  # ----------------------------------------------------------------------
   test:
     name: Test
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+      - uses: actions/setup-node@v4
         with:
           node-version: '24.x'
 
@@ -106,7 +317,7 @@ jobs:
           corepack prepare --activate
 
       - name: Cache pnpm store
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        uses: actions/cache@v4
         with:
           path: ~/.local/share/pnpm/store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
@@ -123,3 +334,43 @@ jobs:
         env:
           NODE_OPTIONS: '--max-old-space-size=8192'
           OPENCLAW_VITEST_MAX_WORKERS: '2'
+
+  # ----------------------------------------------------------------------
+  # 9. Fork CI gate — aggregate the above jobs (mirrors upstream ci-gate)
+  # ----------------------------------------------------------------------
+  ci-gate:
+    name: fork/ci-gate
+    needs: [lint, format-check, docs-check, shrinkwrap-check, bundle-check, dep-guard, build, test]
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Verify all checks
+        shell: bash
+        env:
+          RESULTS: |
+            lint=${{ needs.lint.result }}
+            format-check=${{ needs.format-check.result }}
+            docs-check=${{ needs.docs-check.result }}
+            shrinkwrap-check=${{ needs.shrinkwrap-check.result }}
+            bundle-check=${{ needs.bundle-check.result }}
+            dep-guard=${{ needs.dep-guard.result }}
+            build=${{ needs.build.result }}
+            test=${{ needs.test.result }}
+        run: |
+          set -euo pipefail
+          failures=0
+          while IFS= read -r entry; do
+            [[ -n "$entry" ]] || continue
+            name="${entry%%=*}"
+            result="${entry#*=}"
+            echo "${name}: ${result}"
+            case "$result" in
+              success | skipped) ;;
+              *)
+                echo "::error title=Fork CI job did not succeed::${name} finished with ${result}"
+                failures=1
+                ;;
+            esac
+          done <<< "$RESULTS"
+          exit "$failures"
