@@ -441,6 +441,7 @@ export const FIELD_LABELS: Record<string, string> = {
   "memory.search.rememberAcrossConversations": "Remember Across Conversations",
   "memory.search.sources": "Memory Search Sources",
   "memory.search.extraPaths": "Extra Memory Paths",
+  "memory.search.excludePaths": "Excluded Paths",
   "memory.search.qmd": "Memory Search QMD Collections",
   "memory.search.qmd.extraCollections": "QMD Extra Collections",
   "memory.search.qmd.extraCollections.path": "QMD Extra Collection Path",

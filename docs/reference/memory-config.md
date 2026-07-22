@@ -383,9 +383,10 @@ the built-in engine policy.
 
 ## Additional memory paths
 
-| Key          | Type       | Description                              |
-| ------------ | ---------- | ---------------------------------------- |
-| `extraPaths` | `string[]` | Additional directories or files to index |
+| Key            | Type       | Description                                            |
+| -------------- | ---------- | ------------------------------------------------------ |
+| `extraPaths`   | `string[]` | Additional directories or files to index               |
+| `excludePaths` | `string[]` | Glob patterns or paths to exclude from search indexing |
 
 ```json5
 {
@@ -400,6 +401,28 @@ the built-in engine policy.
 Paths can be absolute or workspace-relative. Directories are scanned recursively for `.md` files. Symlink handling depends on the active backend: the builtin engine skips symlinks, while QMD follows the underlying QMD scanner behavior.
 
 For agent-scoped cross-agent transcript search, use `agents.entries.*.memory.search.qmd.extraCollections` instead of `memory.qmd.paths`. Those extra collections follow the same `{ path, name, pattern? }` shape, but they are merged per agent and can preserve explicit shared names when the path points outside the current workspace. If the same resolved path appears in both `memory.qmd.paths` and `memory.search.qmd.extraCollections`, QMD keeps the first entry and skips the duplicate.
+
+### Excluding paths
+
+Use `excludePaths` to keep files on disk but out of search indexes:
+
+```json5
+{
+  agents: {
+    defaults: {
+      memorySearch: {
+        excludePaths: ["memory/dreaming/light", "memory/archive/**"],
+      },
+    },
+  },
+}
+```
+
+Patterns support [minimatch](https://github.com/isaacs/minimatch) glob syntax. Paths are workspace-relative and forward-slash normalized on all platforms. Exclude filtering runs after builtin auxiliary-path filtering; you only need to match content paths, not system-internal directories.
+
+<Note>
+Only affects the builtin memory backend. QMD collections are not filtered through `excludePaths`.
+</Note>
 
 ---
 

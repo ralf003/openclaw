@@ -61,6 +61,7 @@ export const TARGET_KEYS = [
   "memory.search.fallback",
   "memory.search.sources",
   "memory.search.extraPaths",
+  "memory.search.excludePaths",
   "memory.search.qmd",
   "memory.search.qmd.extraCollections",
   "memory.search.qmd.extraCollections.path",

@@ -50,6 +50,17 @@ export type MemorySearchConfig = {
   sources?: Array<"memory" | "sessions">;
   /** Extra paths to include in memory search (directories or .md files). */
   extraPaths?: string[];
+  /**
+   * Optional glob patterns or exact paths (workspace-relative) to exclude from
+   * memory search indexing. Supports minimatch-style wildcards. Applied against
+   * workspace-relative paths inside memory/ and extraPaths.
+   *
+   * Examples: ["memory/dreaming/light", "memory/archive/**"]
+   *
+   * Only affects the builtin memory backend. QMD collections are not filtered
+   * through this setting.
+   */
+  excludePaths?: string[];
   /** Optional QMD-specific extra collections for cross-agent search. */
   qmd?: {
     /** Additional QMD collections appended for this agent's search scope. */

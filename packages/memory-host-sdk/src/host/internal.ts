@@ -5,6 +5,7 @@ import fs from "node:fs/promises";
 import { homedir } from "node:os";
 import path from "node:path";
 import { normalizeStringEntries, uniqueStrings } from "@openclaw/normalization-core";
+import { minimatch } from "minimatch";
 import { runWithConcurrency as runWithConcurrencyImpl } from "./concurrency.js";
 import { MEMORY_HOST_ROOT_FILENAME } from "./config-utils.js";
 import { estimateStructuredEmbeddingInputBytes } from "./embedding-input-limits.js";
@@ -154,6 +155,7 @@ export async function listMemoryFiles(
   workspaceDir: string,
   extraPaths?: string[],
   multimodal?: MemoryMultimodalSettings,
+  excludePaths?: string[],
 ): Promise<string[]> {
   const result: string[] = [];
   const memoryDir = path.join(workspaceDir, "memory");
@@ -211,6 +213,32 @@ export async function listMemoryFiles(
       } catch {}
     }
   }
+
+  // Filter by excludePaths after collection but before dedup.
+  if (excludePaths && excludePaths.length > 0 && result.length > 0) {
+    const workspaceRel = (abs: string) => {
+      let rel = path.relative(workspaceDir, abs);
+      if (path.sep === "\\") {
+        rel = rel.replace(/\\/g, "/");
+      }
+      return rel;
+    };
+    const filtered = result.filter((absPath) => {
+      const rel = workspaceRel(absPath);
+      for (const pattern of excludePaths) {
+        if (minimatch(rel, pattern, { dot: true })) {
+          return false;
+        }
+      }
+      return true;
+    });
+    if (filtered.length <= 1) {
+      return filtered;
+    }
+    result.length = 0;
+    result.push(...filtered);
+  }
+
   if (result.length <= 1) {
     return result;
   }

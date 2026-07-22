@@ -2607,6 +2607,7 @@ Do not edit it by hand; run `pnpm docs:map:gen`.
   - H2: Search performance and compatibility
   - H2: Model overrides
   - H2: Indexing extra paths
+  - H2: Excluding paths
   - H2: Indexing session transcripts
   - H2: Search scope
   - H2: Citations
