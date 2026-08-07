@@ -387,6 +387,33 @@ function hasRecoveredInstallRecordsMissingFromPersistedIndex(
   );
 }
 
+function hasStalePersistedPluginDiagnostics(index: InstalledPluginIndex): boolean {
+  return index.diagnostics.some((diag) => {
+    const source = diag.source;
+    const hasPluginId = typeof diag.pluginId === "string" && diag.pluginId.trim().length > 0;
+    const sourceMissing =
+      typeof source === "string" && path.isAbsolute(source) && !fs.existsSync(source);
+    // Diagnostics tied to a specific plugin whose source path no longer
+    // exists (e.g. the plugin was uninstalled or moved) are stale. This
+    // also covers legacy persisted diagnostics without a .code field.
+    if (hasPluginId && sourceMissing) {
+      return true;
+    }
+    // Diagnostics tagged with the orphan-source-path code (set by
+    // discoverFromPath only when a previously-discovered uninstalled
+    // plugin's load path no longer exists) are always stale. Without
+    // this, removing a plugin and its files would leave a "plugin path
+    // not found" diagnostic that persists forever in SQLite
+    // diagnostics_json, blocking Gateway startup with an ok:false config
+    // validation error. Ordinary configuration path errors (typo,
+    // non-existent config path) are NOT marked orphan-source-path.
+    if (diag.code === "orphan-source-path") {
+      return true;
+    }
+    return false;
+  });
+}
+
 function requiresDerivedRegistryValidation(
   index: InstalledPluginIndex,
   params: LoadPluginRegistryParams,
@@ -400,9 +427,7 @@ function requiresDerivedRegistryValidation(
     params.installRecords !== undefined ||
     normalizePluginsConfig(params.config?.plugins).loadPaths.length > 0 ||
     hasMissingConfigPathActivationMetadata(index) ||
-    index.diagnostics.some(({ pluginId, source }) =>
-      Boolean(pluginId && source && path.isAbsolute(source) && !fs.existsSync(source)),
-    ) ||
+    hasStalePersistedPluginDiagnostics(index) ||
     hasMismatchedPersistedBundledRoot(index, env) ||
     hasStalePluginFiles() ||
     hasRecoveredInstallRecordsMissingFromPersistedIndex(index, params, env)

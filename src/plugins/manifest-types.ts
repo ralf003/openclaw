@@ -29,6 +29,7 @@ export type PluginBundleFormat = "codex" | "claude" | "cursor";
 export type PluginDiagnosticCode =
   | "channel-setup-failure"
   | "dashboard-declaration-invalid"
+  | "orphan-source-path"
   | "plugin-verification";
 
 /** Diagnostic emitted while discovering or validating plugins. */
