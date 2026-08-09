@@ -320,9 +320,7 @@ export function openOpenClawAgentDatabase(
           assertSupportedAgentSchemaVersion(db, pathname);
           assertExistingAgentSchemaOwner(readExistingAgentSchemaMeta(db), agentId, pathname);
         }
-        // Integrity is not process-stable: the file can be damaged while evicted.
-        // This guard is read-only (no busy waits), so every physical open pays it.
-        assertAgentDatabaseIntegrityBeforeMutation(db, agentId, pathname);
+        assertAgentDatabaseIntegrityBeforeMutation(db, agentId, pathname, isValidatedReopen);
         assertCanonicalAgentMediaPersistenceVersion(db, pathname);
         configureSqlitePreSchemaPragmas(db, {
           busyTimeoutMs: OPENCLAW_SQLITE_BUSY_TIMEOUT_MS,

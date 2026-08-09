@@ -516,6 +516,7 @@ export function assertAgentDatabaseIntegrityBeforeMutation(
   database: DatabaseSync,
   agentId: string,
   pathname: string,
+  isValidatedReopen = false,
 ): void {
   database.exec(`PRAGMA busy_timeout = ${OPENCLAW_SQLITE_BUSY_TIMEOUT_MS};`);
   const userVersion = readSqliteUserVersion(database);
@@ -540,7 +541,23 @@ export function assertAgentDatabaseIntegrityBeforeMutation(
     hasPendingSessionKeyContractSchemaMigration(database);
   const hasPendingAdditiveMigration =
     hasPendingMemoryMigration || hasPendingSessionContractMigration;
-  if (userVersion === OPENCLAW_AGENT_SCHEMA_VERSION && !hasPendingAdditiveMigration) {
+  // A validated reopen reuses a path whose schema and integrity were already
+  // proven within this process lifetime. The lease prevents concurrent external
+  // writers, and page-level checksums catch disk damage during reads. Skipping
+  // the full-table-scan integrity_check avoids event-loop stalls under handle
+  // eviction churn while index contract verification still catches schema drift.
+  const skipFullFileIntegrity =
+    isValidatedReopen &&
+    userVersion === OPENCLAW_AGENT_SCHEMA_VERSION &&
+    !hasPendingAdditiveMigration &&
+    !migrationPending;
+  if (skipFullFileIntegrity) {
+    repairCanonicalSqliteIndexes(database, pathname, OPENCLAW_AGENT_SCHEMA_SQL, {
+      allowMissingColumns: true,
+      verifyPhysicalIntegrity: false,
+    });
+    assertOpenClawAgentCurrentRuntimeSchema(database, { agentId, pathname });
+  } else if (userVersion === OPENCLAW_AGENT_SCHEMA_VERSION && !hasPendingAdditiveMigration) {
     verifyAndRepairCanonicalSqliteIndexes(database, pathname, OPENCLAW_AGENT_SCHEMA_SQL, {
       allowMissingColumns: true,
       validateAfterRepair: () =>
@@ -552,7 +569,11 @@ export function assertAgentDatabaseIntegrityBeforeMutation(
   }
   // Current-version additive surfaces are installed atomically by ensureAgentSchema below.
   // Validating them here would make the same-version repair path unreachable after an update.
-  if (userVersion === OPENCLAW_AGENT_SCHEMA_VERSION && !hasPendingAdditiveMigration) {
+  if (
+    !skipFullFileIntegrity &&
+    userVersion === OPENCLAW_AGENT_SCHEMA_VERSION &&
+    !hasPendingAdditiveMigration
+  ) {
     assertOpenClawAgentCurrentRuntimeSchema(database, { agentId, pathname });
   }
 }
