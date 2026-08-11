@@ -24,6 +24,7 @@ import {
 import {
   getInstalledPluginRecord,
   hasMissingConfigPathActivationMetadata,
+  INSTALLED_PLUGIN_INDEX_VERSION,
   isInstalledPluginEnabled,
   loadInstalledPluginIndexWithDiscovery,
   resolveInstalledPluginIndexPolicyHash,
@@ -400,8 +401,16 @@ function requiresDerivedRegistryValidation(
     params.installRecords !== undefined ||
     normalizePluginsConfig(params.config?.plugins).loadPaths.length > 0 ||
     hasMissingConfigPathActivationMetadata(index) ||
-    index.diagnostics.some(({ pluginId, source }) =>
-      Boolean(pluginId && source && path.isAbsolute(source) && !fs.existsSync(source)),
+    index.version < INSTALLED_PLUGIN_INDEX_VERSION ||
+    index.diagnostics.some(
+      (diag) =>
+        diag.code === "orphan-source-path" ||
+        (Boolean(
+          diag.pluginId &&
+            diag.source &&
+            path.isAbsolute(diag.source) &&
+            !fs.existsSync(diag.source),
+        )),
     ) ||
     hasMismatchedPersistedBundledRoot(index, env) ||
     hasStalePluginFiles() ||

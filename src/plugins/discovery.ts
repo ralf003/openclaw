@@ -1309,6 +1309,7 @@ function discoverFromPath(params: {
       level: "error",
       message: `plugin path not found: ${resolved}`,
       source: resolved,
+      code: "orphan-source-path",
     });
     return;
   }
